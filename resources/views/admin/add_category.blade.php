@@ -92,13 +92,13 @@
 									<div class="col-lg-12">
 										<div class="col-lg-12">
 											<div class="left-area">
-												<h4 class="heading">{{ __('Category Image') }} </h4>
+												<h4 class="heading">{{ __('Category Photo') }} </h4>
 											</div>
 										</div>
 
 										<div class="col-lg-12">
-											<input type="text" class="input-field" placeholder="{{ __('Enter Category Image Url') }}"
-												name="image" value="">
+											<input type="text" class="input-field" placeholder="{{ __('Enter Category Photo Url') }}"
+												name="photo" value="">
 										</div>
 									</div>
 								</div>
@@ -112,7 +112,7 @@
 
 										<div class="col-lg-12">
 											<input type="number" class="input-field" placeholder="{{ __('Enter Category Order Url') }}"
-												name="category_order" value="">
+												name="order" value="">
 										</div>
 									</div>
 								</div>

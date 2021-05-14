@@ -315,7 +315,7 @@ class CategoryController extends Controller
                         'name' => $item['name'],
                         'description' => $item['description'],
                         'price' => $item['price'],
-                        'photo' => $item['image'],
+                        'photo' => $item['photo'],
                         'vegetarian' => $item['vegetarian']=="true"?true:false,
                         'vegan' => $item['vegan']=="true"?true:false,
                         'kosher' => $item['kosher']=="true"?true:false,
@@ -607,7 +607,7 @@ class CategoryController extends Controller
                             'name' => $item['name'],
                             'description' => $item['description'],
                             'price' => $item['price'],
-                            'photo' => $item['image'],
+                            'photo' => $item['photo'],
                             'vegetarian' => $item['vegetarian']=="true"?true:false,
                             'vegan' => $item['vegan']=="true"?true:false,
                             'kosher' => $item['kosher']=="true"?true:false,
@@ -688,65 +688,85 @@ class CategoryController extends Controller
     }
 
     public function datatables() {
-        $datas = Category::orderBy('id','asc')->get();
-
+        // $datas = Category::orderBy('id','asc')->get();
+        $firestore = app('firebase.firestore');
+        $collection = $firestore->database()->collection('vendor_categories');
+        $snapshot = $collection->documents();
+        $vendors_category = [];
+        $vendors_restaurant = [];
+        
+        foreach ($snapshot as $item) {
+            $itemWithId = $item->data();
+            $itemUpdate['vendor_id'] = $item->id();
+            foreach ($itemWithId as $key => $value) {
+                $itemUpdate[$key] = $value;
+            }
+            array_push($vendors_category, $itemUpdate);
+        }
+        
         //--- Integrating This Collection Into Datatables
-        return Datatables::of($datas)
-           ->editColumn('title', function(Category $data) {
-               $title = mb_strlen(strip_tags($data->title),'utf-8') > 50 ? mb_substr(strip_tags($data->title),0,50,'utf-8').'...' : strip_tags($data->title);
+        return Datatables::of($vendors_category)
+           ->editColumn('title', function($data) {
+               $title = mb_strlen(strip_tags($data['title']),'utf-8') > 50 ? mb_substr(strip_tags($data['title']),0,50,'utf-8').'...' : strip_tags($data['title']);
                return $title;
            })
-           ->editColumn('image', function(Category $data) {
-               $image = mb_strlen(strip_tags($data->image),'utf-8') > 50 ? mb_substr(strip_tags($data->image),0,50,'utf-8').'...' : strip_tags($data->image);
-               return  $image;
+           ->editColumn('photo', function($data) {
+               $photo = mb_strlen(strip_tags($data['photo']),'utf-8') > 50 ? mb_substr(strip_tags($data['photo']),0,50,'utf-8').'...' : strip_tags($data['photo']);
+               return  $photo;
            })
-           ->editColumn('category_order', function(Category $data) {
-               return  $data->category_order;
+           ->editColumn('order', function($data) {
+               return  $data['order'];
            })
-           ->addColumn('created_at', function(Category $data) {
-               return  $data->created_at;
+           ->addColumn('action', function($data) {
+               return '<div class="godropdown"><button class="go-dropdown-toggle"> Actions<i class="fas fa-chevron-down"></i></button><div class="action-list"><a href="' . route('admin-category-edit',$data['id']) . '"> <i class="fas fa-edit"></i> Edit</a><a href="javascript:;" data-href="' . route('admin-category-delete',$data['id']) . '" data-toggle="modal" data-target="#confirm-delete" class="delete"><i class="fas fa-trash-alt"></i> Delete</a></div></div>';
            })
-           ->addColumn('updated_at', function(Category $data) {
-               return  $data->updated_at;
-           })
-           ->addColumn('action', function(Category $data) {
-               return '<div class="godropdown"><button class="go-dropdown-toggle"> Actions<i class="fas fa-chevron-down"></i></button><div class="action-list"><a href="' . route('admin-category-edit',$data->id) . '"> <i class="fas fa-edit"></i> Edit</a><a href="javascript:;" data-href="' . route('admin-category-delete',$data->id) . '" data-toggle="modal" data-target="#confirm-delete" class="delete"><i class="fas fa-trash-alt"></i> Delete</a></div></div>';
-           })
-           ->rawColumns(['name', 'status', 'action'])
+           ->rawColumns(['title', 'status', 'action'])
            ->toJson(); //--- Returning Json Data To Client Side
     }
 
     public function edit($id){
-        $data = Category::findOrFail($id);
+        $firestore = app('firebase.firestore');
+        $ref = $firestore->database()->collection('vendor_categories')->document($id);
+        $snapshot = $frankRef->snapshot();   
+        $data = $snapshot->data();
      
         return view('admin.edit_cat',compact('data'));
     }
 
     public function create(Request $request) {
-        $res = new Category();
         $res['title'] = $request['title'];
-        $res['image'] = $request['image'];
-        $res['category_order'] = $request['category_order'];
+        $res['photo'] = $request['photo'];
+        $res['order'] = $request['order'];
 
-        $res->save();
+        $firestore = app('firebase.firestore');
+        $ref = $firestore->database()->collection('vendor_categories');
+        $new = $ref->newDocument();
+        $res['id'] = $new->id();
+        $new->set($res);
+
         $msg = 'Category Created Successfully.<a href="'.route('admin-categories').'">View Category Lists.</a>';
         return response()->json($msg);
     }
 
     public function update(Request $request, $id){
-        $res = Category::where('id','=',$id)->first();
-        $res['title'] = $request['title'];
-        $res['image'] = $request['image'];
-        $res['category_order'] = $request['category_order'];
+        $firestore = app('firebase.firestore');
+        $ref = $firestore->database()->collection('vendor_categories')->document($id);
+        
+        $data['id'] = $id;
 
-        $res->save();
+        $data['title'] = $request['title'];
+        $data['photo'] = $request['photo'];
+        $data['order'] = $request['order'];
+
+        $refs->set($data);
         $msg = 'Category Updated Successfully.<a href="'.route('admin-categories').'">View Category Lists.</a>';
         return response()->json($msg);
     }
 
     public function resdelete($id){
-        $data = Category::findOrFail($id);
-        $data->delete();
+        $firestore = app('firebase.firestore');
+        $ref = $firestore->database()->collection('vendor_categories')->document($id);
+        $ref->delete();
         $msg = 'Category Deleted Successfully.';
         return response()->json($msg);
     }

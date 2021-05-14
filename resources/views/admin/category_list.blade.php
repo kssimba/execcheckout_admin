@@ -34,10 +34,8 @@
 												<thead>
 													<tr>
                             <th>{{ __("Title") }}</th>
-                            <th>{{ __("Image") }}</th>
-                            <th>{{ __("Category Order") }}</th>
-                            <th>{{ __("Created At") }}</th>
-                            <th>{{ __("Updated At") }}</th>
+                            <th>{{ __("Photo") }}</th>
+                            <th>{{ __("Order") }}</th>
                             <th>{{ __("Options") }}</th>
 													</tr>
 												</thead>
@@ -192,10 +190,8 @@
         ajax: '{{ route('admin.category.datatables') }}',
         columns: [
           { data: 'title', name: 'title' },
-          { data: 'image', name: 'image' },
-          { data: 'category_order', name: 'category_order' },
-          { data: 'created_at', name: 'created_at' },
-          { data: 'updated_at', name: 'updated_at' },
+          { data: 'photo', name: 'photo' },
+          { data: 'order', name: 'order' },
           { data: 'action', searchable: false, orderable: false }
 
         ],

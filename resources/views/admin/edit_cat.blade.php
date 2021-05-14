@@ -59,7 +59,7 @@
 		</div>
 	</div>
 
-	<form id="geniusform" action="{{ route('admin-category-update',$data->id) }}" method="POST" enctype="multipart/form-data">
+	<form id="geniusform" action="{{ route('admin-category-update',$data['id']) }}" method="POST" enctype="multipart/form-data">
 		{{csrf_field()}}
 		<div class="col-lg-6 m-auto">
 			<div class="add-product-content">
@@ -83,7 +83,7 @@
 										</div>
 										<div class="col-lg-12">
 											<input type="text" class="input-field" placeholder="{{ __('Enter Category Title') }}"
-												name="title" value = "{{ $data->title }}" required="">
+												name="title" value = "{{ $data['title'] }}" required="">
 										</div>
 									</div>
 
@@ -92,13 +92,13 @@
 									<div class="col-lg-12">
 										<div class="col-lg-12">
 											<div class="left-area">
-												<h4 class="heading">{{ __('Category Image') }} </h4>
+												<h4 class="heading">{{ __('Category Photo') }} </h4>
 											</div>
 										</div>
 
 										<div class="col-lg-12">
-											<input type="text" class="input-field" placeholder="{{ __('Enter Category Image Url') }}"
-												name="image" value="{{ $data->image }}">
+											<input type="text" class="input-field" placeholder="{{ __('Enter Category Photo Url') }}"
+												name="photo" value="{{ $data['photo'] }}">
 										</div>
 									</div>
 								</div>
@@ -112,7 +112,7 @@
 
 										<div class="col-lg-12">
 											<input type="number" class="input-field" placeholder="{{ __('Enter Category Order Url') }}"
-												name="category_order" value="{{ $data->category_order }}">
+												name="order" value="{{ $data['order'] }}">
 										</div>
 									</div>
 								</div>
